@@ -9,5 +9,7 @@
     "forceConsistentCasingInFileNames": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   }
 }
