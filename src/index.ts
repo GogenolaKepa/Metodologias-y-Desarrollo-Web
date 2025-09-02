@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import "dotenv/config";
 import mongoose from "mongoose";
+import "reflect-metadata";
 import userRoutes from "./routes/userRoutes"
 import productRoutes from "./routes/productRoutes";
 
@@ -11,7 +12,7 @@ const port = process.env.PORT;
 const mongoUri = process.env.MONGODB_URI!;
 
 app.use(express.json({ limit: '10mb' }));
-
+app.use("/api/products", productRoutes);
 app.use('/api/users', userRoutes);
 
 app.get('/', (req, res) => {
