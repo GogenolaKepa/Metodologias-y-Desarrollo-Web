@@ -42,4 +42,9 @@ export class CreateUserDto {
   @Min(1, { message: "La edad no puede ser menor a uno" })
   @IsOptional()
   age?: number;
+
+  @IsString({ message: "La contraseña debe ser un texto" })
+  @MinLength(6, { message: "La contraseña debe tener al menos 6 caracteres" })
+  @IsNotEmpty({ message: "La contraseña es obligatoria" })
+  password!: string;
 }
