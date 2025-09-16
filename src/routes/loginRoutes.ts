@@ -1,6 +1,7 @@
 import {
   registerUser,
-  login
+  login,
+  logout
 } from "../controllers/userController";
 import express from "express";
 import validationMiddleware from "../middlewares/middleware";
@@ -10,5 +11,6 @@ const router = express.Router();
 
 router.post("/register", validationMiddleware(CreateUserDto), registerUser);
 router.post("/login", login);
+router.post("/logout", logout);
 
 export default router;

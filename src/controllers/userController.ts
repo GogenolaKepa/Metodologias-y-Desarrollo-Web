@@ -66,8 +66,10 @@ export const updateUser = async (req: Request, res: Response) => {
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
-  const jwtSecret = process.env.JWT_SECRET;
-  const jwtExpiresIn = process.env.JWT_EXPIRES_IN!;
+  const jwtAccessSecret = process.env.JWT_SECRET;
+  const jwtAccessExpiresIn = process.env.JWT_EXPIRES_IN!;
+  const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET!;
+  const jwtRefreshExpiresIn = process.env.JWT_REFRESH_EXPIRES_IN!;
   const findUser = await User.findOne({ email });
 
   if (!findUser) return res.status(404).json({ message: "Usuario no encontrado" });
@@ -75,14 +77,40 @@ export const login = async (req: Request, res: Response) => {
   const isMatch = await bcrypt.compare(password, findUser.password);
   if (!isMatch) return res.status(401).json({ message: "Credenciales inválidas" });
 
-  if (!jwtSecret) {
+  if (!jwtAccessSecret || !jwtRefreshSecret) {
     return res.status(500).json({ message: "JWT no definido" });
   }
-  const token = jwt.sign(
+  const accessToken = jwt.sign(
     { userId: findUser._id.toString(), email: findUser.email },
-    jwtSecret,
-    { expiresIn: jwtExpiresIn }
+    jwtAccessSecret,
+    { expiresIn: jwtAccessExpiresIn }
   );
 
-  return res.json({ token });
+    const refreshToken = jwt.sign(
+    { userId: findUser._id.toString() },
+    jwtRefreshSecret,
+    { expiresIn: jwtRefreshExpiresIn }
+  );
+
+  res.cookie('accessToken', accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 1000 // 1 minute
+  });
+
+  res.cookie('refreshToken', refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  });
+
+  return res.json({ message: "Login exitoso" })
+};
+
+export const logout = async (req: Request, res: Response) => {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    return res.json({ message: "Logout exitoso" });
 };
