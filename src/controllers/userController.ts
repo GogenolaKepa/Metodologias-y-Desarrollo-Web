@@ -106,7 +106,7 @@ export const login = async (req: Request, res: Response) => {
     maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
   });
 
-  return res.json({ message: "Login exitoso" })
+  return res.status(200).json(findUser);
 };
 
 export const logout = async (req: Request, res: Response) => {
